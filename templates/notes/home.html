@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans 'my_blog.about.title' %} - {% trans 'my_blog.main_menu.home' %}{% endblock %}
+
+{% block meta %}
+    {% include 'my_blog/parts/_site_meta.html' %}
+{% endblock %}
+
+{% block content %}
+    <div class="col-md-12">
+        <h1>{% trans 'notes.articles' %}</h1>
+
+        {% if articles %}
+            {% for article in articles %}
+                {% include 'notes/parts/_article_preview.html' %}
+            {% endfor %}
+        {% endif %}
+
+        {% if not articles%}
+            <p>{% trans 'my_blog.coming_soon' %}</p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load i18n staticfiles blog_extras %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static 'js/jquery.fancybox.min.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".fancybox").fancybox();
+        });
+    </script>
+{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/libs/jquery.fancybox.css' %}">
+{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="{{ article.preview|striptags }}">
+    {% if article.preview_image %}
+        <meta name="og:image" content="{{ article|social_share_image:request }}">
+    {% endif %}
+    <meta property="og:title" content="{{ article.title }}" />
+    <meta property="og:description" content="{{ article.preview|striptags }}" />
+    <meta property="og:url" content="{{ request.build_absolute_uri }}" />
+
+    {% if TWITTER_ACCOUNT %}
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@{{ TWITTER_ACCOUNT }}">
+        <meta name="twitter:creator" content="@{{ TWITTER_ACCOUNT }}">
+        <meta name="twitter:title" content="{{ article.title }}">
+        <meta name="twitter:description" content="{{ article.preview|striptags }}">
+        {% if article.preview_image %}
+            <meta name="twitter:image:src" content="{{ article.preview_image.article.url }}">
+        {% endif %}
+    {% endif %}
+
+    <!-- Google+ -->
+    <meta itemprop="name" content="{{ article.title }}">
+    <meta itemprop="description" content="{{ article.preview|striptags }}">
+    {% if article.preview_image %}
+        <meta itemprop="image" content="{{ article.preview_image.article.url }}">
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="col-md-12">
+        <div class="article">
+            <h1>{{ article.title }}</h1>
+            {% include 'notes/parts/_article_header.html' %}
+
+            <div class="body">
+                {{ article.preview|safe }}
+                {{ article.body|safe }}
+
+                {% if relative_articles %}
+                    <div class="relative-articles">
+                        <hr/>
+                        <p>{{ article.category.name }}. Другие заметки:</p>
+                        <ul>
+                            {% for relative_article in relative_articles %}
+                                <li><a href="{% url 'view_article' relative_article.slug %}">{{ relative_article.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if HYPER_COMMENTS_ID %}
+        <div class="col-md-12 comments">
+            <div id="hypercomments_widget"></div>
+            <script type="text/javascript">
+                _hcwp = window._hcwp || [];
+                _hcwp.push({widget:"Stream", widget_id: {{ HYPER_COMMENTS_ID }}});
+                (function() {
+                    if("HC_LOAD_INIT" in window) return;
+                    HC_LOAD_INIT = true;
+                    var lang = 'ru';
+                    var hcc = document.createElement("script"); hcc.type = "text/javascript"; hcc.async = true;
+                    hcc.src = ("https:" == document.location.protocol ? "https" : "http")+"://w.hypercomments.com/widget/hc/15854/"+lang+"/widget.js";
+                    var s = document.getElementsByTagName("script")[0];
+                    s.parentNode.insertBefore(hcc, s.nextSibling);
+                })();
+            </script>
+        </div>
+    {% endif %}
+
+{% endblock %}
